@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>İlk Kurulum - Guard Bot</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-box" style="width:380px;">
+      <h1>🔧 İlk Kurulum</h1>
+      <% if (error) { %><div class="error"><%= error %></div><% } %>
+      <form method="POST" action="/setup">
+        <label>Kurulum Anahtarı (.env - SETUP_KEY)</label>
+        <input type="password" name="setupKey" required>
+        <label>Discord Sunucu ID'n (Guild ID)</label>
+        <input type="text" name="guildId" required placeholder="örn: 123456789012345678">
+        <label>Senin Discord Kullanıcı ID'n (owner - DM bildirimleri için)</label>
+        <input type="text" name="ownerDiscordId" placeholder="örn: 987654321098765432">
+        <label>Panel Kullanıcı Adı</label>
+        <input type="text" name="username" required>
+        <label>Panel Şifresi</label>
+        <input type="password" name="password" required>
+        <button type="submit" style="width:100%">Hesabı Oluştur</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

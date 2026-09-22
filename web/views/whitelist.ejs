@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Whitelist</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>✅ Whitelist</h1>
+      <div class="subtitle">Whitelist'teki kişiler guard sistemlerinden asla ceza almaz (sunucu sahibi zaten otomatik muaf).</div>
+      <% if (saved) { %><div class="success">✅ Kaydedildi.</div><% } %>
+
+      <div class="card">
+        <h3>👤 Whitelist Kullanıcılar</h3>
+        <form class="inline-form" method="POST" action="/dashboard/whitelist/add-user">
+          <input type="text" name="userId" placeholder="Discord Kullanıcı ID'si" required>
+          <button type="submit">Ekle</button>
+        </form>
+        <% config.whitelistUsers.forEach(id => { %>
+          <div class="list-item">
+            <span><%= id %></span>
+            <form method="POST" action="/dashboard/whitelist/remove-user">
+              <input type="hidden" name="userId" value="<%= id %>">
+              <button type="submit" class="btn-danger">Kaldır</button>
+            </form>
+          </div>
+        <% }) %>
+        <% if (config.whitelistUsers.length === 0) { %><p style="color:#9aa0ac;font-size:13px;">Henüz kimse eklenmedi.</p><% } %>
+      </div>
+
+      <div class="card">
+        <h3>🎭 Whitelist Roller</h3>
+        <div class="desc">Bu rollere sahip olan herkes otomatik muaf sayılır.</div>
+        <form class="inline-form" method="POST" action="/dashboard/whitelist/add-role">
+          <select name="roleId" required style="margin-bottom:0;">
+            <option value="">— Rol seç —</option>
+            <% if (guild) { guild.roles.cache.filter(r => r.id !== guild.id).forEach(r => { %>
+              <option value="<%= r.id %>">@<%= r.name %></option>
+            <% }) } %>
+          </select>
+          <button type="submit">Ekle</button>
+        </form>
+        <% config.whitelistRoles.forEach(id => { %>
+          <div class="list-item">
+            <span><%= guild ? ('@' + (guild.roles.cache.get(id)?.name || id)) : id %></span>
+            <form method="POST" action="/dashboard/whitelist/remove-role">
+              <input type="hidden" name="roleId" value="<%= id %>">
+              <button type="submit" class="btn-danger">Kaldır</button>
+            </form>
+          </div>
+        <% }) %>
+        <% if (config.whitelistRoles.length === 0) { %><p style="color:#9aa0ac;font-size:13px;">Henüz rol eklenmedi.</p><% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

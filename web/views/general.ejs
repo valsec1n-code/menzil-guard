@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Genel Ayarlar</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>⚙️ Genel Ayarlar</h1>
+      <div class="subtitle">Prefix, hoşgeldin mesajı ve otomatik rol</div>
+      <% if (saved) { %><div class="success">✅ Kaydedildi.</div><% } %>
+
+      <form method="POST" action="/dashboard/general">
+        <div class="card">
+          <h3>Bot Prefix</h3>
+          <input type="text" name="prefix" value="<%= config.prefix %>" maxlength="5">
+        </div>
+
+        <div class="card">
+          <h3>👋 Hoşgeldin Mesajı</h3>
+          <div class="checkbox-row">
+            <input type="checkbox" name="welcome_enabled" id="we" <%= config.welcome.enabled ? 'checked' : '' %>>
+            <label for="we" style="margin:0;">Aktif</label>
+          </div>
+          <label>Kanal</label>
+          <select name="welcomeChannelId">
+            <option value="">— Seç —</option>
+            <% if (guild) { guild.channels.cache.filter(c => c.type === 0).forEach(ch => { %>
+              <option value="<%= ch.id %>" <%= config.welcome.channelId === ch.id ? 'selected' : '' %>>#<%= ch.name %></option>
+            <% }) } %>
+          </select>
+          <label>Mesaj ({user} yazarsan otomatik etiketler)</label>
+          <textarea name="welcomeMessage" rows="3"><%= config.welcome.message %></textarea>
+        </div>
+
+        <div class="card">
+          <h3>🎭 Otomatik Rol</h3>
+          <div class="desc">Doğrulama kapalıysa, yeni katılan herkese direkt verilir.</div>
+          <select name="autoRoleId">
+            <option value="">— Yok —</option>
+            <% if (guild) { guild.roles.cache.filter(r => r.id !== guild.id).forEach(r => { %>
+              <option value="<%= r.id %>" <%= config.autoRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+            <% }) } %>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>👑 Owner Discord ID</h3>
+          <div class="desc">Kritik olaylarda DM bildirimi bu ID'ye gider.</div>
+          <input type="text" name="ownerDiscordId" value="<%= config.ownerDiscordId || '' %>">
+        </div>
+
+        <button type="submit">💾 Kaydet</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

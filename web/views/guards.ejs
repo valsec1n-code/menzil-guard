@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Guard Ayarları</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>🛡️ Guard Ayarları</h1>
+      <div class="subtitle">Sunucunu koruyan sistemleri buradan yönet</div>
+      <% if (saved) { %><div class="success">✅ Ayarlar kaydedildi.</div><% } %>
+
+      <form method="POST" action="/dashboard/guards">
+
+        <div class="card">
+          <h3>⚔️ Anti-Nuke</h3>
+          <div class="desc">Toplu kanal/rol silme, toplu ban ve izinsiz yetki değişikliklerine karşı korur.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="antiNuke_enabled" id="an" <%= config.antiNuke.enabled ? 'checked' : '' %>>
+            <label for="an" style="margin:0;">Aktif</label>
+          </div>
+          <div class="grid-2">
+            <div><label>Kaç kanal silinince tetiklensin</label><input type="number" name="channelDeleteThreshold" value="<%= config.antiNuke.channelDeleteThreshold %>"></div>
+            <div><label>Kaç rol silinince tetiklensin</label><input type="number" name="roleDeleteThreshold" value="<%= config.antiNuke.roleDeleteThreshold %>"></div>
+            <div><label>Kaç ban/kick tetiklesin</label><input type="number" name="banThreshold" value="<%= config.antiNuke.banThreshold %>"></div>
+            <div><label>Zaman aralığı (saniye)</label><input type="number" name="antiNukeWindow" value="<%= config.antiNuke.timeWindowSeconds %>"></div>
+          </div>
+          <label>Ceza türü</label>
+          <select name="antiNukePunishment">
+            <option value="ban" <%= config.antiNuke.punishment === 'ban' ? 'selected' : '' %>>Ban</option>
+            <option value="kick" <%= config.antiNuke.punishment === 'kick' ? 'selected' : '' %>>Kick</option>
+            <option value="strip_roles" <%= config.antiNuke.punishment === 'strip_roles' ? 'selected' : '' %>>Sadece rolleri al</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>🌊 Anti-Raid</h3>
+          <div class="desc">Kısa sürede çok fazla üye girişini (bot ordusu) tespit eder.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="antiRaid_enabled" id="ar" <%= config.antiRaid.enabled ? 'checked' : '' %>>
+            <label for="ar" style="margin:0;">Aktif</label>
+          </div>
+          <div class="grid-2">
+            <div><label>Kaç üye girişi tetiklesin</label><input type="number" name="joinThreshold" value="<%= config.antiRaid.joinThreshold %>"></div>
+            <div><label>Zaman aralığı (saniye)</label><input type="number" name="antiRaidWindow" value="<%= config.antiRaid.timeWindowSeconds %>"></div>
+          </div>
+          <label>Tetiklenince ne olsun</label>
+          <select name="antiRaidAction">
+            <option value="lockdown" <%= config.antiRaid.action === 'lockdown' ? 'selected' : '' %>>Sunucuyu kilitle</option>
+            <option value="kick_new" <%= config.antiRaid.action === 'kick_new' ? 'selected' : '' %>>Yeni gelenleri at</option>
+            <option value="dm_owner" <%= config.antiRaid.action === 'dm_owner' ? 'selected' : '' %>>Sadece bana haber ver</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>💬 Anti-Spam</h3>
+          <div class="desc">Mesaj flood ve aşırı mention'a karşı korur.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="antiSpam_enabled" id="as" <%= config.antiSpam.enabled ? 'checked' : '' %>>
+            <label for="as" style="margin:0;">Aktif</label>
+          </div>
+          <div class="grid-2">
+            <div><label>Kaç mesaj tetiklesin</label><input type="number" name="messageThreshold" value="<%= config.antiSpam.messageThreshold %>"></div>
+            <div><label>Zaman aralığı (saniye)</label><input type="number" name="antiSpamWindow" value="<%= config.antiSpam.timeWindowSeconds %>"></div>
+            <div><label>Mention limiti (tek mesaj)</label><input type="number" name="mentionLimit" value="<%= config.antiSpam.mentionLimit %>"></div>
+            <div><label>Susturma süresi (dakika)</label><input type="number" name="muteDurationMinutes" value="<%= config.antiSpam.muteDurationMinutes %>"></div>
+          </div>
+          <label>Ceza türü</label>
+          <select name="antiSpamPunishment">
+            <option value="mute" <%= config.antiSpam.punishment === 'mute' ? 'selected' : '' %>>Sustur (Mute)</option>
+            <option value="kick" <%= config.antiSpam.punishment === 'kick' ? 'selected' : '' %>>Kick</option>
+            <option value="ban" <%= config.antiSpam.punishment === 'ban' ? 'selected' : '' %>>Ban</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>🔗 Vanity URL Guard</h3>
+          <div class="desc">Özel davet linkin (discord.gg/menzil) değiştirilirse otomatik eski haline döner.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="vanityGuard_enabled" id="vg" <%= config.vanityGuard.enabled ? 'checked' : '' %>>
+            <label for="vg" style="margin:0;">Aktif</label>
+          </div>
+          <div style="font-size:12px; color:#9aa0ac;">Kayıtlı vanity kod: <b><%= config.vanityGuard.savedVanityCode || 'henüz kaydedilmedi (bot yeniden başlayınca otomatik kaydedilir)' %></b></div>
+        </div>
+
+        <div class="card">
+          <h3>🪝 Webhook Guard</h3>
+          <div class="desc">İzinsiz oluşturulan webhook'ları (genelde spam/link atmak için kullanılır) tespit edip siler.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="webhookGuard_enabled" id="wg" <%= config.webhookGuard.enabled ? 'checked' : '' %>>
+            <label for="wg" style="margin:0;">Aktif</label>
+          </div>
+          <label>Ceza türü</label>
+          <select name="webhookPunishment">
+            <option value="ban" <%= config.webhookGuard.punishment === 'ban' ? 'selected' : '' %>>Ban</option>
+            <option value="kick" <%= config.webhookGuard.punishment === 'kick' ? 'selected' : '' %>>Kick</option>
+            <option value="strip_roles" <%= config.webhookGuard.punishment === 'strip_roles' ? 'selected' : '' %>>Sadece rolleri al</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>✅ Doğrulama Sistemi</h3>
+          <div class="desc">Yeni üyeler bir butona basmadan sunucuyu tam kullanamaz.</div>
+          <div class="checkbox-row">
+            <input type="checkbox" name="verification_enabled" id="ve" <%= config.verification.enabled ? 'checked' : '' %>>
+            <label for="ve" style="margin:0;">Aktif</label>
+          </div>
+          <label>Doğrulama Kanalı</label>
+          <select name="verificationChannelId">
+            <option value="">— Seç —</option>
+            <% if (guild) { guild.channels.cache.filter(c => c.type === 0).forEach(ch => { %>
+              <option value="<%= ch.id %>" <%= config.verification.channelId === ch.id ? 'selected' : '' %>>#<%= ch.name %></option>
+            <% }) } %>
+          </select>
+          <label>Doğrulandıktan sonra verilecek rol</label>
+          <select name="verifiedRoleId">
+            <option value="">— Seç —</option>
+            <% if (guild) { guild.roles.cache.filter(r => r.id !== guild.id).forEach(r => { %>
+              <option value="<%= r.id %>" <%= config.verification.verifiedRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+            <% }) } %>
+          </select>
+        </div>
+
+        <button type="submit">💾 Tüm Guard Ayarlarını Kaydet</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

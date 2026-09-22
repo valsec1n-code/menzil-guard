@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Log Ayarları</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>📜 Loglar</h1>
+      <div class="subtitle">Log kanalı ve bildirim ayarları</div>
+      <% if (saved) { %><div class="success">✅ Kaydedildi.</div><% } %>
+
+      <div class="card">
+        <h3>Ayarlar</h3>
+        <form method="POST" action="/dashboard/logs">
+          <label>Log Kanalı</label>
+          <select name="logChannelId">
+            <option value="">— Seç —</option>
+            <% if (guild) { guild.channels.cache.filter(c => c.type === 0).forEach(ch => { %>
+              <option value="<%= ch.id %>" <%= config.logChannelId === ch.id ? 'selected' : '' %>>#<%= ch.name %></option>
+            <% }) } %>
+          </select>
+
+          <div class="checkbox-row">
+            <input type="checkbox" name="dmOwnerOnCritical" id="dm" <%= config.dmOwnerOnCritical ? 'checked' : '' %>>
+            <label for="dm" style="margin:0;">Kritik olaylarda bana (owner) DM at</label>
+          </div>
+
+          <label>Hangi olaylar loglansın</label>
+          <% const allEvents = ['channel_delete','role_delete','ban','kick','invite_change','webhook_create','anti_raid','anti_spam']; %>
+          <% allEvents.forEach(ev => { %>
+            <div class="checkbox-row">
+              <input type="checkbox" name="logEvents" value="<%= ev %>" id="ev_<%= ev %>" <%= config.logEvents.includes(ev) ? 'checked' : '' %>>
+              <label for="ev_<%= ev %>" style="margin:0;"><%= ev %></label>
+            </div>
+          <% }) %>
+
+          <button type="submit" style="margin-top:10px;">💾 Kaydet</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Son 50 Log</h3>
+        <table>
+          <tr><th>Tarih</th><th>Tip</th><th>Açıklama</th><th>Kişi</th><th>Ceza</th></tr>
+          <% logs.forEach(log => { %>
+            <tr>
+              <td><%= new Date(log.createdAt).toLocaleString('tr-TR') %></td>
+              <td><span class="tag"><%= log.type %></span></td>
+              <td><%= log.description %></td>
+              <td><%= log.moderatorTag || '-' %></td>
+              <td><%= log.actionTaken || '-' %></td>
+            </tr>
+          <% }) %>
+          <% if (logs.length === 0) { %><tr><td colspan="5" style="color:#9aa0ac;">Henüz kayıt yok.</td></tr><% } %>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

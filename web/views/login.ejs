@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Giriş Yap - Guard Bot</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <h1>🛡️ Guard Bot Panel</h1>
+      <% if (error) { %><div class="error"><%= error %></div><% } %>
+      <form method="POST" action="/login">
+        <label>Kullanıcı Adı</label>
+        <input type="text" name="username" required>
+        <label>Şifre</label>
+        <input type="password" name="password" required>
+        <button type="submit" style="width:100%">Giriş Yap</button>
+      </form>
+      <p style="margin-top:16px; font-size:12px; color:#9aa0ac;">
+        Hiç hesabın yok mu? <a href="/setup" style="color:#5865F2;">İlk kurulumu yap</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

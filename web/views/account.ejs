@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hesabım</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>👤 Hesabım</h1>
+      <div class="subtitle">Giriş yapan: <b><%= user.username %></b> (<%= user.role %>)</div>
+      <% if (saved) { %><div class="success">✅ Kaydedildi.</div><% } %>
+      <% if (error) { %><div class="error"><%= error %></div><% } %>
+
+      <div class="card">
+        <h3>🔑 Şifre Değiştir</h3>
+        <form method="POST" action="/dashboard/account/password">
+          <label>Mevcut Şifre</label>
+          <input type="password" name="currentPassword" required>
+          <label>Yeni Şifre</label>
+          <input type="password" name="newPassword" required minlength="6">
+          <button type="submit">Şifreyi Güncelle</button>
+        </form>
+      </div>
+
+      <% if (user.role === 'owner') { %>
+      <div class="card">
+        <h3>➕ Yeni Panel Kullanıcısı Ekle</h3>
+        <div class="desc">Güvendiğin bir kişiye de panel erişimi verebilirsin.</div>
+        <form method="POST" action="/dashboard/account/add-admin">
+          <label>Kullanıcı Adı</label>
+          <input type="text" name="username" required>
+          <label>Şifre</label>
+          <input type="password" name="password" required minlength="6">
+          <button type="submit">Ekle</button>
+        </form>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
