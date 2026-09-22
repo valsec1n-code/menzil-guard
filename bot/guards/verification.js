@@ -10,7 +10,19 @@ function registerVerification(client) {
       const channel = member.guild.channels.cache.get(config.welcome.channelId);
       if (channel) {
         const msg = config.welcome.message.replace('{user}', `<@${member.id}>`);
-        channel.send(msg).catch(() => {});
+
+        if (config.welcome.useEmbed) {
+          const embed = new EmbedBuilder()
+            .setColor(0x5865F2)
+            .setTitle('👋 Yeni Üye!')
+            .setDescription(msg)
+            .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
+            .addFields({ name: '📊 Toplam Üye', value: `${member.guild.memberCount}`, inline: true })
+            .setTimestamp();
+          channel.send({ embeds: [embed] }).catch(() => {});
+        } else {
+          channel.send(msg).catch(() => {});
+        }
       }
     }
 

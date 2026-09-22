@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Moderasyon</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>🔨 Moderasyon</h1>
+      <div class="subtitle">Manuel ceza uygula ve kullanıcı geçmişini görüntüle</div>
+      <% if (result) { %><div class="success">✅ İşlem sonucu: <%= result %></div><% } %>
+
+      <div class="card">
+        <h3>Manuel İşlem</h3>
+        <form method="POST" action="/dashboard/moderate/action">
+          <label>Discord Kullanıcı ID</label>
+          <input type="text" name="userId" required placeholder="örn: 123456789012345678">
+          <label>İşlem</label>
+          <select name="action" id="actionSelect" onchange="document.getElementById('banDurationRow').style.display = this.value === 'ban' ? 'block' : 'none'">
+            <option value="kick">Kick</option>
+            <option value="ban">Ban</option>
+            <option value="mute">Mute (10 dk)</option>
+            <option value="unban">Unban</option>
+          </select>
+          <div id="banDurationRow">
+            <label>Ban süresi (gün, 0 = kalıcı)</label>
+            <input type="number" name="banDurationDays" value="0" min="0">
+          </div>
+          <label>Sebep</label>
+          <input type="text" name="reason" placeholder="opsiyonel">
+          <button type="submit" class="btn-danger">İşlemi Uygula</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Kullanıcı Geçmişi Ara</h3>
+        <form class="inline-form" method="GET" action="/dashboard/moderate">
+          <input type="text" name="userId" placeholder="Discord Kullanıcı ID" value="<%= searchId || '' %>" required>
+          <button type="submit">Ara</button>
+        </form>
+
+        <% if (searchId) { %>
+          <table>
+            <tr><th>Tarih</th><th>Tip</th><th>Açıklama</th><th>Ceza</th></tr>
+            <% history.forEach(h => { %>
+              <tr>
+                <td><%= new Date(h.createdAt).toLocaleString('tr-TR') %></td>
+                <td><span class="tag"><%= h.type %></span></td>
+                <td><%= h.description %></td>
+                <td><%= h.actionTaken || '-' %></td>
+              </tr>
+            <% }) %>
+            <% if (history.length === 0) { %><tr><td colspan="4" style="color:#9aa0ac;">Bu kullanıcı için kayıt bulunamadı.</td></tr><% } %>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

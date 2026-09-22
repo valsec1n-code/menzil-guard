@@ -41,7 +41,7 @@ function registerVanityGuard(client) {
     if (executor) {
       const executorMember = await newGuild.members.fetch(executor.id).catch(() => null);
       if (!(await isWhitelisted(config, executorMember))) {
-        const punishResult = await applyPunishment(newGuild, executor.id, 'ban', 'Vanity URL izinsiz değiştirildi');
+        const punishResult = await applyPunishment(newGuild, executor.id, 'ban', 'Vanity URL izinsiz değiştirildi', 10, config.banDurationDays);
         actionTaken += ` + ${punishResult}`;
       }
     }

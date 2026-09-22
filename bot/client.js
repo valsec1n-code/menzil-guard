@@ -7,6 +7,11 @@ const { registerVanityGuard } = require('./guards/vanityGuard');
 const { registerInviteGuard } = require('./guards/inviteGuard');
 const { registerWebhookGuard } = require('./guards/webhookGuard');
 const { registerVerification } = require('./guards/verification');
+const { registerAntiBot } = require('./guards/antiBot');
+const { registerAccountAgeGuard } = require('./guards/accountAgeGuard');
+const { registerContentFilters } = require('./guards/contentFilters');
+const { registerInviteTracking } = require('./guards/inviteTracking');
+const { startTempBanScheduler } = require('./utils/tempBanScheduler');
 const registerCommands = require('./commands');
 
 function createBotClient() {
@@ -37,6 +42,11 @@ function createBotClient() {
   registerInviteGuard(client);
   registerWebhookGuard(client);
   registerVerification(client);
+  registerAntiBot(client);
+  registerAccountAgeGuard(client);
+  registerContentFilters(client);
+  registerInviteTracking(client);
+  startTempBanScheduler(client);
 
   // Komutları bağla
   registerCommands(client);

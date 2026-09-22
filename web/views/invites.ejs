@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Davetler</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>✉️ Davet İstatistikleri</h1>
+      <div class="subtitle">Kim kaç kişi davet etti</div>
+
+      <div class="card">
+        <table>
+          <tr><th>#</th><th>Kullanıcı</th><th>Davet Ettiği Kişi Sayısı</th></tr>
+          <% stats.forEach((s, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= s.inviterTag %> (<%= s.inviterId %>)</td>
+              <td><b><%= s.uses %></b></td>
+            </tr>
+          <% }) %>
+          <% if (stats.length === 0) { %><tr><td colspan="3" style="color:#9aa0ac;">Henüz veri yok.</td></tr><% } %>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

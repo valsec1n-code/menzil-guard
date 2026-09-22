@@ -25,6 +25,29 @@
         </form>
       </div>
 
+      <div class="card">
+        <h3>🔐 İki Adımlı Doğrulama (2FA)</h3>
+        <% if (user.twoFactorEnabled) { %>
+          <div class="desc" style="color:#57f287;">✅ 2FA aktif, hesabın ekstra korumalı.</div>
+          <form method="POST" action="/dashboard/account/2fa/disable">
+            <button type="submit" class="btn-danger">2FA'yı Kapat</button>
+          </form>
+        <% } else if (qr) { %>
+          <div class="desc">Google Authenticator / Authy gibi bir uygulamayla bu kodu tara, sonra uygulamadaki 6 haneli kodu gir.</div>
+          <img src="<%= qr %>" style="background:#fff; padding:10px; border-radius:8px; margin-bottom:14px;">
+          <form method="POST" action="/dashboard/account/2fa/confirm">
+            <label>Doğrulama Kodu</label>
+            <input type="text" name="code" maxlength="6" required>
+            <button type="submit">Onayla ve Aktifleştir</button>
+          </form>
+        <% } else { %>
+          <div class="desc">Panel hesabına ekstra güvenlik katmanı ekle (Google Authenticator vb. ile).</div>
+          <form method="POST" action="/dashboard/account/2fa/start">
+            <button type="submit">2FA'yı Kur</button>
+          </form>
+        <% } %>
+      </div>
+
       <% if (user.role === 'owner') { %>
       <div class="card">
         <h3>➕ Yeni Panel Kullanıcısı Ekle</h3>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Güvenlik</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>🔒 Güvenlik</h1>
+      <div class="subtitle">Panel giriş geçmişin (son 50 deneme)</div>
+
+      <div class="card">
+        <table>
+          <tr><th>Tarih</th><th>IP</th><th>Durum</th><th>Detay</th></tr>
+          <% logs.forEach(l => { %>
+            <tr>
+              <td><%= new Date(l.createdAt).toLocaleString('tr-TR') %></td>
+              <td><%= l.ip %></td>
+              <td><%= l.success ? '✅ Başarılı' : '❌ Başarısız' %></td>
+              <td><%= l.reason %></td>
+            </tr>
+          <% }) %>
+          <% if (logs.length === 0) { %><tr><td colspan="4" style="color:#9aa0ac;">Henüz kayıt yok.</td></tr><% } %>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

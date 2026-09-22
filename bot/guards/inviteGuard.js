@@ -7,7 +7,7 @@ function registerInviteGuard(client) {
   client.on('inviteDelete', async (invite) => {
     if (!invite.guild) return;
     const config = await getConfig(invite.guild.id);
-    if (!config.antiNuke.enabled) return; // davet koruması anti-nuke ayarına bağlı
+    if (!config.inviteGuard.enabled) return;
 
     const executor = await findExecutor(invite.guild, AuditLogEvent.InviteDelete);
     if (!executor) return;
@@ -31,7 +31,7 @@ function registerInviteGuard(client) {
       console.error('Yeni davet oluşturma hatası:', e.message);
     }
 
-    const action = await applyPunishment(invite.guild, executor.id, 'ban', 'İzinsiz davet silme');
+    const action = await applyPunishment(invite.guild, executor.id, 'ban', 'İzinsiz davet silme', 10, config.banDurationDays);
 
     await logEvent(invite.guild, config, {
       type: 'invite_guard',

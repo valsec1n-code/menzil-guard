@@ -24,7 +24,7 @@ function registerWebhookGuard(client) {
       console.error('Webhook temizleme hatası:', e.message);
     }
 
-    const action = await applyPunishment(channel.guild, executor.id, config.webhookGuard.punishment, 'İzinsiz webhook oluşturma');
+    const action = await applyPunishment(channel.guild, executor.id, config.webhookGuard.punishment, 'İzinsiz webhook oluşturma', 10, config.banDurationDays);
 
     await logEvent(channel.guild, config, {
       type: 'webhook_guard',

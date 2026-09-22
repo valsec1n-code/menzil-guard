@@ -103,6 +103,20 @@ discord-guard-bot/
     └── models/                 # MongoDB şemaları
 ```
 
+## 🆕 Ek Özellikler
+
+- **Kanal/Rol Aç-Sil Guard'ları**: 4'ü ayrı ayrı, kendi eşik/ceza ayarlarıyla
+- **Anti-Bot**: Whitelist dışı botların sunucuya girmesini engeller
+- **Yeni Hesap Koruması**: Hesap yaşı X günden azsa kick/ban/karantina
+- **Kelime Filtresi**: Yasaklı kelime listesi, otomatik silme + ceza
+- **Link Filtresi**: Sadece izin verilen domainlere izin verme
+- **Geçici Ban**: Panelden veya guard'lardan verilen banlar X gün sonra otomatik kalkar
+- **Davet Takip Sistemi**: `/dashboard/invites` - kim kaç kişi davet etti
+- **Manuel Moderasyon Paneli**: `/dashboard/moderate` - panelden direkt kick/ban/mute/unban + kullanıcı ceza geçmişi arama
+- **2FA**: `/dashboard/account` - Google Authenticator ile ekstra güvenlik
+- **Giriş Güvenliği**: 5 yanlış denemede 15 dakika kilit + `/dashboard/security`'de giriş geçmişi
+- **İstatistik Grafiği**: Ana sayfada son 7 günün engellenen olay sayısı
+
 ## ⚠️ Notlar
 
 - Bot rolünün sunucudaki **en üstte** olması gerekiyor (özellikle rol/yetki

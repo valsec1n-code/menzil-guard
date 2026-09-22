@@ -5,19 +5,49 @@ const GuildConfigSchema = new mongoose.Schema({
 
   prefix: { type: String, default: '!' },
 
-  // ---- GUARD SİSTEMLERİ ----
-  antiNuke: {
+  // ---- KANAL GUARD (açma / silme ayrı ayrı) ----
+  channelGuard: {
+    deleteEnabled: { type: Boolean, default: true },
+    deleteThreshold: { type: Number, default: 3 },
+    deleteWindowSeconds: { type: Number, default: 10 },
+    deletePunishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'ban' },
+
+    createEnabled: { type: Boolean, default: false },
+    createThreshold: { type: Number, default: 5 },
+    createWindowSeconds: { type: Number, default: 10 },
+    createPunishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'kick' }
+  },
+
+  // ---- ROL GUARD (açma / silme ayrı ayrı) ----
+  roleGuard: {
+    deleteEnabled: { type: Boolean, default: true },
+    deleteThreshold: { type: Number, default: 3 },
+    deleteWindowSeconds: { type: Number, default: 10 },
+    deletePunishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'ban' },
+
+    createEnabled: { type: Boolean, default: false },
+    createThreshold: { type: Number, default: 5 },
+    createWindowSeconds: { type: Number, default: 10 },
+    createPunishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'kick' }
+  },
+
+  // ---- TOPLU BAN/KICK GUARD ----
+  banGuard: {
     enabled: { type: Boolean, default: true },
-    channelDeleteThreshold: { type: Number, default: 3 },   // kaç kanal silinince tetiklensin
-    roleDeleteThreshold: { type: Number, default: 3 },
-    banThreshold: { type: Number, default: 3 },              // kaç toplu ban/kick
-    timeWindowSeconds: { type: Number, default: 10 },        // kaç saniye içinde
+    threshold: { type: Number, default: 3 },
+    windowSeconds: { type: Number, default: 10 },
+    punishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'ban' }
+  },
+
+  // ---- İZİNSİZ YETKİ DEĞİŞİKLİĞİ GUARD (örn. @everyone'a admin verme) ----
+  permissionGuard: {
+    enabled: { type: Boolean, default: true },
     punishment: { type: String, enum: ['kick', 'ban', 'strip_roles'], default: 'ban' }
   },
 
   antiRaid: {
     enabled: { type: Boolean, default: true },
-    joinThreshold: { type: Number, default: 8 },              // kaç üye
+    joinThreshold: { type: Number, default: 8 },
     timeWindowSeconds: { type: Number, default: 10 },
     action: { type: String, enum: ['lockdown', 'kick_new', 'dm_owner'], default: 'lockdown' }
   },
@@ -31,9 +61,43 @@ const GuildConfigSchema = new mongoose.Schema({
     muteDurationMinutes: { type: Number, default: 10 }
   },
 
+  // ---- ANTİ-BOT ----
+  antiBot: {
+    enabled: { type: Boolean, default: false },
+    punishment: { type: String, enum: ['kick', 'ban'], default: 'kick' }
+  },
+
+  // ---- YENİ HESAP KORUMASI ----
+  accountAgeGuard: {
+    enabled: { type: Boolean, default: false },
+    minDays: { type: Number, default: 7 },
+    action: { type: String, enum: ['kick', 'ban', 'quarantine'], default: 'kick' },
+    quarantineRoleId: { type: String, default: null }
+  },
+
+  // ---- KELİME FİLTRESİ ----
+  wordFilter: {
+    enabled: { type: Boolean, default: false },
+    words: [{ type: String }],
+    punishment: { type: String, enum: ['delete_only', 'mute', 'kick'], default: 'delete_only' },
+    muteDurationMinutes: { type: Number, default: 10 }
+  },
+
+  // ---- LİNK FİLTRESİ ----
+  linkFilter: {
+    enabled: { type: Boolean, default: false },
+    allowedDomains: [{ type: String }],
+    punishment: { type: String, enum: ['delete_only', 'mute', 'kick'], default: 'delete_only' },
+    muteDurationMinutes: { type: Number, default: 10 }
+  },
+
   vanityGuard: {
     enabled: { type: Boolean, default: true },
     savedVanityCode: { type: String, default: null }
+  },
+
+  inviteGuard: {
+    enabled: { type: Boolean, default: true } // normal davet linki silinirse koruma
   },
 
   webhookGuard: {
@@ -64,9 +128,13 @@ const GuildConfigSchema = new mongoose.Schema({
   welcome: {
     enabled: { type: Boolean, default: false },
     channelId: { type: String, default: null },
-    message: { type: String, default: 'Sunucumuza hoş geldin {user}!' }
+    message: { type: String, default: 'Sunucumuza hoş geldin {user}!' },
+    useEmbed: { type: Boolean, default: true }
   },
-  autoRoleId: { type: String, default: null }
+  autoRoleId: { type: String, default: null },
+
+  // Otomatik guard cezalarında "ban" uygulanınca kaç gün sürsün (0 = kalıcı)
+  banDurationDays: { type: Number, default: 0 }
 
 }, { timestamps: true });
 

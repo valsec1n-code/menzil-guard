@@ -1,4 +1,5 @@
 const LogEntry = require('../../database/models/LogEntry');
+const TempBan = require('../../database/models/TempBan');
 
 /**
  * Bir kullanıcının whitelist'te olup olmadığını kontrol eder
@@ -19,7 +20,7 @@ async function isWhitelisted(config, member) {
 /**
  * Belirtilen cezayı uygular: 'kick' | 'ban' | 'strip_roles' | 'mute'
  */
-async function applyPunishment(guild, userId, punishmentType, reason, muteDurationMinutes = 10) {
+async function applyPunishment(guild, userId, punishmentType, reason, muteDurationMinutes = 10, banDurationDays = 0) {
   try {
     const member = await guild.members.fetch(userId).catch(() => null);
     if (!member) return `Kullanıcı sunucuda bulunamadı (${userId})`;
@@ -27,7 +28,12 @@ async function applyPunishment(guild, userId, punishmentType, reason, muteDurati
     switch (punishmentType) {
       case 'ban':
         await guild.members.ban(userId, { reason });
-        return 'ban';
+        if (banDurationDays && banDurationDays > 0) {
+          const unbanAt = new Date(Date.now() + banDurationDays * 24 * 60 * 60 * 1000);
+          await TempBan.create({ guildId: guild.id, userId, unbanAt, reason });
+          return `ban (${banDurationDays} gün sonra otomatik affedilecek)`;
+        }
+        return 'ban (kalıcı)';
 
       case 'kick':
         await member.kick(reason);

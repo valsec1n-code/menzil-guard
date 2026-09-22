@@ -34,6 +34,10 @@
           </select>
           <label>Mesaj ({user} yazarsan otomatik etiketler)</label>
           <textarea name="welcomeMessage" rows="3"><%= config.welcome.message %></textarea>
+          <div class="checkbox-row">
+            <input type="checkbox" name="welcomeUseEmbed" id="wue" <%= config.welcome.useEmbed ? 'checked' : '' %>>
+            <label for="wue" style="margin:0;">Görsel embed olarak gönder (avatar + üye sayısı)</label>
+          </div>
         </div>
 
         <div class="card">
