@@ -1,25 +1,10 @@
-const { getConfig } = require('../utils/getConfig');
-
+// Bot üzerinde hiçbir prefix komutu ÇALIŞMIYOR (bilerek).
+// Ayarlar sadece web dashboard'dan yönetiliyor, Discord'da kimse
+// (adminler dahil) hiçbir komut yazarak ayar/işlem yapamaz.
+// Guard sistemleri (anti-nuke, anti-raid vs.) bu dosyadan bağımsız,
+// otomatik olarak çalışmaya devam eder.
 function registerCommands(client) {
-  client.on('messageCreate', async (message) => {
-    if (message.author.bot || !message.guild) return;
-
-    const config = await getConfig(message.guild.id);
-    const prefix = config.prefix || '!';
-    if (!message.content.startsWith(prefix)) return;
-
-    const args = message.content.slice(prefix.length).trim().split(/\s+/);
-    const cmd = args.shift().toLowerCase();
-
-    if (cmd === 'ping') {
-      return message.reply(`🏓 Pong! Gecikme: ${client.ws.ping}ms`);
-    }
-
-    if (cmd === 'panel') {
-      const url = process.env.DASHBOARD_URL || 'Dashboard adresi henüz ayarlanmadı';
-      return message.reply(`🌐 Ayar panelin: ${url}`);
-    }
-  });
+  // Kasıtlı olarak boş bırakıldı - komut dinleyicisi eklenmiyor.
 }
 
 module.exports = registerCommands;
