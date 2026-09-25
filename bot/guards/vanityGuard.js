@@ -27,32 +27,35 @@ function registerVanityGuard(client) {
     const savedCode = config.vanityGuard.savedVanityCode || oldGuild.vanityURLCode;
     if (!savedCode) return; // kayıtlı kod yoksa referans alacak bir şey yok
 
-    const executor = await require('../utils/auditLog').findExecutor(newGuild, AuditLogEvent.GuildUpdate);
-
-    // Eski vanity koduna geri dön
-    try {
-      await newGuild.edit({ vanityURLCode: savedCode });
-    } catch (e) {
+    // ⚡ ÖNCELİK: HİÇBİR ŞEY BEKLEMEDEN ANINDA GERİ AL.
+    // Kod boşa çıktığı an başka biri (sniper bot) kapabilir, o yüzden
+    // audit log / kim yaptı araştırması bundan SONRA yapılır.
+    newGuild.edit({ vanityURLCode: savedCode }).catch(e => {
       console.error('Vanity geri alma hatası:', e.message);
-    }
-
-    let actionTaken = 'Vanity link eski haline döndürüldü';
-
-    if (executor) {
-      const executorMember = await newGuild.members.fetch(executor.id).catch(() => null);
-      if (!(await isWhitelisted(config, executorMember))) {
-        const punishResult = await applyPunishment(newGuild, executor.id, 'ban', 'Vanity URL izinsiz değiştirildi', 10, config.banDurationDays);
-        actionTaken += ` + ${punishResult}`;
-      }
-    }
-
-    await logEvent(newGuild, config, {
-      type: 'vanity_guard',
-      description: `Vanity link "${oldGuild.vanityURLCode}" -> "${newGuild.vanityURLCode}" olarak değiştirildi. Eski koda geri dönüldü.`,
-      moderatorId: executor?.id,
-      moderatorTag: executor?.tag,
-      actionTaken
     });
+
+    // Kim yaptığını ve cezayı arka planda (geri alma işlemini bloklamadan) işle
+    (async () => {
+      const executor = await require('../utils/auditLog').findExecutor(newGuild, AuditLogEvent.GuildUpdate);
+
+      let actionTaken = 'Vanity link anında eski haline döndürüldü';
+
+      if (executor) {
+        const executorMember = await newGuild.members.fetch(executor.id).catch(() => null);
+        if (!(await isWhitelisted(config, executorMember))) {
+          const punishResult = await applyPunishment(newGuild, executor.id, 'ban', 'Vanity URL izinsiz değiştirildi', 10, config.banDurationDays);
+          actionTaken += ` + ${punishResult}`;
+        }
+      }
+
+      await logEvent(newGuild, config, {
+        type: 'vanity_guard',
+        description: `Vanity link "${oldGuild.vanityURLCode}" -> "${newGuild.vanityURLCode}" olarak değiştirildi. Anında eski koda dönüldü.`,
+        moderatorId: executor?.id,
+        moderatorTag: executor?.tag,
+        actionTaken
+      });
+    })();
   });
 }
 
