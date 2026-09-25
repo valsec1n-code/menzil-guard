@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vanity Sniper</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>🎯 Vanity Sniper</h1>
+      <div class="subtitle">Ana bottan tamamen bağımsız çalışır. İzlenen kod boşa çıkarsa, hedef sunucuya anında kapmaya çalışır.</div>
+      <% if (message) { %><div class="success"><%= message %></div><% } %>
+
+      <div class="card">
+        <h3>Yeni Hedef Ekle</h3>
+        <form method="POST" action="/dashboard/sniper/add">
+          <label>İzlenecek Vanity Kod</label>
+          <input type="text" name="watchedCode" placeholder="örn: menzil" required>
+          <label>Boşalırsa Çekilecek Sunucu ID</label>
+          <input type="text" name="targetGuildId" placeholder="Sniper botunun içinde olduğu boostlu sunucu ID'si" required>
+          <div class="desc">⚠️ Sniper bot bu sunucuda olmalı ve "Sunucuyu Yönet" yetkisine sahip olmalı.</div>
+          <button type="submit">➕ İzlemeye Al</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>İzlenen Kodlar</h3>
+        <table>
+          <tr><th>Kod</th><th>Hedef Sunucu</th><th>Durum</th><th>Son Kontrol</th><th>Aktif</th><th></th></tr>
+          <% targets.forEach(t => { %>
+            <tr>
+              <td><b>discord.gg/<%= t.watchedCode %></b></td>
+              <td><%= t.targetGuildName || t.targetGuildId %></td>
+              <td><%= t.lastStatus %></td>
+              <td><%= t.lastCheckedAt ? new Date(t.lastCheckedAt).toLocaleTimeString('tr-TR') : '-' %></td>
+              <td>
+                <form method="POST" action="/dashboard/sniper/toggle" style="display:inline;">
+                  <input type="hidden" name="id" value="<%= t._id %>">
+                  <button type="submit"><%= t.enabled ? '⏸️ Durdur' : '▶️ Başlat' %></button>
+                </form>
+              </td>
+              <td>
+                <form method="POST" action="/dashboard/sniper/delete" style="display:inline;">
+                  <input type="hidden" name="id" value="<%= t._id %>">
+                  <button type="submit" class="btn-danger">Sil</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (targets.length === 0) { %><tr><td colspan="6" style="color:#9aa0ac;">Henüz izlenen kod yok.</td></tr><% } %>
+        </table>
+        <p style="font-size:12px;color:#9aa0ac;margin-top:10px;">Bu sayfa her yenilendiğinde son durumu gösterir. Kontrol her 2 saniyede bir arka planda otomatik çalışır.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

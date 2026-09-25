@@ -117,6 +117,19 @@ discord-guard-bot/
 - **Giriş Güvenliği**: 5 yanlış denemede 15 dakika kilit + `/dashboard/security`'de giriş geçmişi
 - **İstatistik Grafiği**: Ana sayfada son 7 günün engellenen olay sayısı
 
+## 🎯 Vanity Sniper (Opsiyonel, İkinci Bot)
+
+Ana bottan tamamen bağımsız çalışan, izlediğin bir vanity kodu (örn. `menzil`) boşa
+çıkarsa belirlediğin başka bir sunucuya anında kapmaya çalışan ekstra bir sistem.
+
+**Kurulum:**
+1. Discord Developer Portal'da **ikinci** bir uygulama/bot oluştur, token'ı al
+2. Bu botu, kodu kapmasını istediğin **boostlu** sunucuna davet et (`Manage Server` yetkisiyle)
+3. Railway **Variables**'a `SNIPER_BOT_TOKEN` olarak bu token'ı ekle
+4. Redeploy sonrası panelde **"🎯 Vanity Sniper"** sekmesinden izlenecek kodu ve hedef sunucu ID'sini ekle
+
+`SNIPER_BOT_TOKEN` boş bırakılırsa bu özellik tamamen kapalı kalır, ana bota hiçbir etkisi olmaz.
+
 ## ⚠️ Notlar
 
 - Bot rolünün sunucudaki **en üstte** olması gerekiyor (özellikle rol/yetki

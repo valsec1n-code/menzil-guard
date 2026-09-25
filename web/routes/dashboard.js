@@ -14,6 +14,7 @@ const { invalidateCache } = require('../../bot/utils/getConfig');
 const { applyPunishment, logEvent } = require('../../bot/utils/punish');
 const { createBackup, restoreBackup } = require('../../bot/utils/backup');
 const ServerBackup = require('../../database/models/ServerBackup');
+const VanitySniper = require('../../database/models/VanitySniper');
 
 router.use(requireAuth);
 
@@ -377,6 +378,36 @@ router.post('/dashboard/backup/restore', async (req, res) => {
 router.post('/dashboard/backup/delete', async (req, res) => {
   await ServerBackup.deleteOne({ _id: req.body.backupId, guildId: req.dashboardUser.guildId });
   res.redirect('/dashboard/backup?message=' + encodeURIComponent('Yedek silindi'));
+});
+
+// ---- VANITY SNIPER ----
+router.get('/dashboard/sniper', async (req, res) => {
+  const targets = await VanitySniper.find({ ownerUsername: req.dashboardUser.username }).sort({ createdAt: -1 });
+  res.render('sniper', { active: 'sniper', targets, message: req.query.message || null });
+});
+
+router.post('/dashboard/sniper/add', async (req, res) => {
+  const { watchedCode, targetGuildId } = req.body;
+  await VanitySniper.create({
+    ownerUsername: req.dashboardUser.username,
+    watchedCode: watchedCode.trim().toLowerCase(),
+    targetGuildId: targetGuildId.trim()
+  });
+  res.redirect('/dashboard/sniper?message=' + encodeURIComponent('✅ Eklendi, izlemeye başlandı'));
+});
+
+router.post('/dashboard/sniper/toggle', async (req, res) => {
+  const target = await VanitySniper.findOne({ _id: req.body.id, ownerUsername: req.dashboardUser.username });
+  if (target) {
+    target.enabled = !target.enabled;
+    await target.save();
+  }
+  res.redirect('/dashboard/sniper');
+});
+
+router.post('/dashboard/sniper/delete', async (req, res) => {
+  await VanitySniper.deleteOne({ _id: req.body.id, ownerUsername: req.dashboardUser.username });
+  res.redirect('/dashboard/sniper?message=' + encodeURIComponent('Silindi'));
 });
 
 module.exports = router;
