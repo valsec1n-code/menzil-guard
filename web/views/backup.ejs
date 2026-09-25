@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Yedekleme</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <%- include('partials/nav', { active }) %>
+    <div class="content">
+      <h1>💾 Sunucu Yedekleme</h1>
+      <div class="subtitle">Kanal ve rol yapını yedekle, nuke olursa geri getir</div>
+      <% if (message) { %><div class="success"><%= message %></div><% } %>
+
+      <div class="card">
+        <h3>Yeni Yedek Al</h3>
+        <div class="desc">Sunucudaki tüm kanal ve rollerin anlık görüntüsünü kaydeder. Ayrıca her gün otomatik olarak da yedek alınır.</div>
+        <form method="POST" action="/dashboard/backup/create">
+          <label>Yedek Adı (opsiyonel)</label>
+          <input type="text" name="name" placeholder="örn: Etkinlik öncesi yedek">
+          <button type="submit">💾 Şimdi Yedek Al</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Mevcut Yedekler</h3>
+        <div class="desc">Geri yükleme, yedekte olup şu an sunucuda OLMAYAN kanal/rolleri isme göre yeniden oluşturur. Hiçbir şeyi silmez, güvenlidir.</div>
+        <table>
+          <tr><th>Tarih</th><th>Ad</th><th>Alan</th><th>Kanal/Rol</th><th>İşlem</th></tr>
+          <% backups.forEach(b => { %>
+            <tr>
+              <td><%= new Date(b.createdAt).toLocaleString('tr-TR') %></td>
+              <td><%= b.name %></td>
+              <td><%= b.createdBy || '-' %></td>
+              <td><%= b.channels.length %> kanal, <%= b.roles.length %> rol</td>
+              <td>
+                <form method="POST" action="/dashboard/backup/restore" style="display:inline;" onsubmit="return confirm('Bu yedekteki eksik kanal/rolleri geri getirmek istediğine emin misin?');">
+                  <input type="hidden" name="backupId" value="<%= b._id %>">
+                  <button type="submit">Geri Yükle</button>
+                </form>
+                <form method="POST" action="/dashboard/backup/delete" style="display:inline;">
+                  <input type="hidden" name="backupId" value="<%= b._id %>">
+                  <button type="submit" class="btn-danger">Sil</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (backups.length === 0) { %><tr><td colspan="5" style="color:#9aa0ac;">Henüz yedek yok.</td></tr><% } %>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

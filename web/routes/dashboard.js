@@ -12,6 +12,8 @@ const InviteStat = require('../../database/models/InviteStat');
 const TempBan = require('../../database/models/TempBan');
 const { invalidateCache } = require('../../bot/utils/getConfig');
 const { applyPunishment, logEvent } = require('../../bot/utils/punish');
+const { createBackup, restoreBackup } = require('../../bot/utils/backup');
+const ServerBackup = require('../../database/models/ServerBackup');
 
 router.use(requireAuth);
 
@@ -342,6 +344,39 @@ router.post('/dashboard/account/2fa/disable', async (req, res) => {
   req.dashboardUser.twoFactorSecret = null;
   await req.dashboardUser.save();
   res.redirect('/dashboard/account?saved=1');
+});
+
+// ---- YEDEKLEME ----
+router.get('/dashboard/backup', async (req, res) => {
+  const backups = await ServerBackup.find({ guildId: req.dashboardUser.guildId }).sort({ createdAt: -1 }).limit(30);
+  res.render('backup', { active: 'backup', guild: req.discordGuild, backups, message: req.query.message || null });
+});
+
+router.post('/dashboard/backup/create', async (req, res) => {
+  if (!req.discordGuild) return res.redirect('/dashboard/backup?message=' + encodeURIComponent('Bot bu sunucuda bulunamadı'));
+  try {
+    await createBackup(req.discordGuild, req.body.name || null, req.dashboardUser.username);
+    res.redirect('/dashboard/backup?message=' + encodeURIComponent('✅ Yedek başarıyla alındı'));
+  } catch (e) {
+    res.redirect('/dashboard/backup?message=' + encodeURIComponent('❌ Hata: ' + e.message));
+  }
+});
+
+router.post('/dashboard/backup/restore', async (req, res) => {
+  if (!req.discordGuild) return res.redirect('/dashboard/backup?message=' + encodeURIComponent('Bot bu sunucuda bulunamadı'));
+  try {
+    const result = await restoreBackup(req.discordGuild, req.body.backupId);
+    const msg = `✅ Geri yükleme tamam: ${result.rolesCreated} rol, ${result.channelsCreated} kanal oluşturuldu.` +
+      (result.errors.length ? ` (${result.errors.length} hata oluştu)` : '');
+    res.redirect('/dashboard/backup?message=' + encodeURIComponent(msg));
+  } catch (e) {
+    res.redirect('/dashboard/backup?message=' + encodeURIComponent('❌ Hata: ' + e.message));
+  }
+});
+
+router.post('/dashboard/backup/delete', async (req, res) => {
+  await ServerBackup.deleteOne({ _id: req.body.backupId, guildId: req.dashboardUser.guildId });
+  res.redirect('/dashboard/backup?message=' + encodeURIComponent('Yedek silindi'));
 });
 
 module.exports = router;

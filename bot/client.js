@@ -12,6 +12,7 @@ const { registerAccountAgeGuard } = require('./guards/accountAgeGuard');
 const { registerContentFilters } = require('./guards/contentFilters');
 const { registerInviteTracking } = require('./guards/inviteTracking');
 const { startTempBanScheduler } = require('./utils/tempBanScheduler');
+const { startAutoBackupScheduler } = require('./utils/autoBackupScheduler');
 const registerCommands = require('./commands');
 
 function createBotClient() {
@@ -47,6 +48,7 @@ function createBotClient() {
   registerContentFilters(client);
   registerInviteTracking(client);
   startTempBanScheduler(client);
+  startAutoBackupScheduler(client);
 
   // Komutları bağla
   registerCommands(client);
