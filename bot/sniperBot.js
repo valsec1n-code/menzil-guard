@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const VanitySniper = require('../database/models/VanitySniper');
 
-const POLL_INTERVAL_MS = 2000; // her 2 saniyede bir kontrol
+const POLL_INTERVAL_MS = 500; // her 500ms'de bir kontrol (Discord rate limit sınırları içinde ulaşılabilecek en hızlı güvenli değer)
 
 function startSniperBot(token) {
   const sniperClient = new Client({ intents: [GatewayIntentBits.Guilds] });
