@@ -60,6 +60,23 @@
           <button type="submit">Ekle</button>
         </form>
       </div>
+
+      <div class="card">
+        <h3>👥 Mevcut Panel Kullanıcıları</h3>
+        <% if (otherAdmins.length === 0) { %>
+          <p style="color:#9aa0ac; font-size:13px;">Senin dışında başka panel kullanıcısı yok.</p>
+        <% } else { %>
+          <% otherAdmins.forEach(a => { %>
+            <div class="list-item">
+              <span><%= a.username %> <span class="tag"><%= a.role %></span></span>
+              <form method="POST" action="/dashboard/account/delete-admin" onsubmit="return confirm('<%= a.username %> kullanıcısını silmek istediğine emin misin?');">
+                <input type="hidden" name="userId" value="<%= a._id %>">
+                <button type="submit" class="btn-danger">Sil</button>
+              </form>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
       <% } %>
     </div>
   </div>

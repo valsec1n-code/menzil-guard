@@ -284,15 +284,18 @@ router.get('/dashboard/security', async (req, res) => {
 });
 
 // ---- HESAP AYARLARI ----
-router.get('/dashboard/account', (req, res) => {
-  res.render('account', { active: 'account', user: req.dashboardUser, error: null, saved: req.query.saved, qr: null });
+router.get('/dashboard/account', async (req, res) => {
+  const otherAdmins = req.dashboardUser.role === 'owner'
+    ? await DashboardUser.find({ guildId: req.dashboardUser.guildId, _id: { $ne: req.dashboardUser._id } })
+    : [];
+  res.render('account', { active: 'account', user: req.dashboardUser, otherAdmins, error: null, saved: req.query.saved, qr: null });
 });
 
 router.post('/dashboard/account/password', async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const match = await bcrypt.compare(currentPassword, req.dashboardUser.passwordHash);
   if (!match) {
-    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Mevcut şifre yanlış.', saved: null, qr: null });
+    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Mevcut şifre yanlış.', otherAdmins: [], saved: null, qr: null });
   }
   req.dashboardUser.passwordHash = await bcrypt.hash(newPassword, 10);
   await req.dashboardUser.save();
@@ -303,10 +306,18 @@ router.post('/dashboard/account/add-admin', async (req, res) => {
   const { username, password } = req.body;
   const existing = await DashboardUser.findOne({ username });
   if (existing) {
-    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Bu kullanıcı adı zaten var.', saved: null, qr: null });
+    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Bu kullanıcı adı zaten var.', otherAdmins: [], saved: null, qr: null });
   }
   const passwordHash = await bcrypt.hash(password, 10);
   await DashboardUser.create({ username, passwordHash, guildId: req.dashboardUser.guildId, role: 'admin' });
+  res.redirect('/dashboard/account?saved=1');
+});
+
+router.post('/dashboard/account/delete-admin', async (req, res) => {
+  if (req.dashboardUser.role !== 'owner') return res.redirect('/dashboard/account');
+  const { userId } = req.body;
+  if (userId === req.dashboardUser._id.toString()) return res.redirect('/dashboard/account'); // kendini silemez
+  await DashboardUser.deleteOne({ _id: userId, guildId: req.dashboardUser.guildId });
   res.redirect('/dashboard/account?saved=1');
 });
 
@@ -317,7 +328,7 @@ router.post('/dashboard/account/2fa/start', async (req, res) => {
   await req.dashboardUser.save();
 
   const qr = await qrcode.toDataURL(secret.otpauth_url);
-  res.render('account', { active: 'account', user: req.dashboardUser, error: null, saved: null, qr });
+  res.render('account', { active: 'account', user: req.dashboardUser, error: null, otherAdmins: [], saved: null, qr });
 });
 
 router.post('/dashboard/account/2fa/confirm', async (req, res) => {
@@ -332,7 +343,7 @@ router.post('/dashboard/account/2fa/confirm', async (req, res) => {
     const qr = await qrcode.toDataURL(speakeasy.otpauthURL({
       secret: req.dashboardUser.twoFactorSecret, label: req.dashboardUser.username, encoding: 'base32'
     }));
-    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Kod yanlış, tekrar dene.', saved: null, qr });
+    return res.render('account', { active: 'account', user: req.dashboardUser, error: 'Kod yanlış, tekrar dene.', otherAdmins: [], saved: null, qr });
   }
 
   req.dashboardUser.twoFactorEnabled = true;
