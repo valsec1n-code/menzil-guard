@@ -14,6 +14,23 @@ function registerAntiSpam(client) {
     const member = message.member;
     if (await isWhitelisted(config, member)) return;
 
+    // @everyone / @here engelleme (tek başına bile olsa)
+    if (config.antiSpam.blockEveryoneMentions && message.mentions.everyone) {
+      await message.delete().catch(() => {});
+      const action = await applyPunishment(
+        message.guild, message.author.id, config.antiSpam.punishment,
+        'Anti-spam: izinsiz @everyone/@here kullanımı', config.antiSpam.muteDurationMinutes
+      );
+      await logEvent(message.guild, config, {
+        type: 'anti_spam_everyone',
+        description: `${message.author.tag} izinsiz @everyone/@here kullandı.`,
+        moderatorId: message.author.id,
+        moderatorTag: message.author.tag,
+        actionTaken: action
+      });
+      return;
+    }
+
     // Aşırı mention kontrolü (tek mesajda)
     if (message.mentions.users.size + message.mentions.roles.size >= config.antiSpam.mentionLimit) {
       await message.delete().catch(() => {});

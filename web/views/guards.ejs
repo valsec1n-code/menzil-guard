@@ -133,6 +133,10 @@
             <div><label>Mention limiti</label><input type="number" name="mentionLimit" value="<%= config.antiSpam.mentionLimit %>"></div>
             <div><label>Susturma süresi (dakika)</label><input type="number" name="muteDurationMinutes" value="<%= config.antiSpam.muteDurationMinutes %>"></div>
           </div>
+          <div class="checkbox-row" style="margin-top:10px;">
+            <input type="checkbox" name="blockEveryone_enabled" id="beo" <%= config.antiSpam.blockEveryoneMentions ? 'checked' : '' %>>
+            <label for="beo" style="margin:0;">@everyone / @here kullanımını tamamen engelle (whitelist hariç)</label>
+          </div>
           <label>Ceza türü</label>
           <select name="antiSpamPunishment">
             <option value="mute" <%= config.antiSpam.punishment === 'mute' ? 'selected' : '' %>>Sustur</option>

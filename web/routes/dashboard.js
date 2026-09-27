@@ -109,6 +109,7 @@ router.post('/dashboard/guards', async (req, res) => {
   c.antiSpam.messageThreshold = Number(b.messageThreshold);
   c.antiSpam.timeWindowSeconds = Number(b.antiSpamWindow);
   c.antiSpam.mentionLimit = Number(b.mentionLimit);
+  c.antiSpam.blockEveryoneMentions = b.blockEveryone_enabled === 'on';
   c.antiSpam.punishment = b.antiSpamPunishment;
   c.antiSpam.muteDurationMinutes = Number(b.muteDurationMinutes);
 

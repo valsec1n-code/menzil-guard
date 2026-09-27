@@ -57,6 +57,7 @@ const GuildConfigSchema = new mongoose.Schema({
     messageThreshold: { type: Number, default: 6 },
     timeWindowSeconds: { type: Number, default: 5 },
     mentionLimit: { type: Number, default: 5 },
+    blockEveryoneMentions: { type: Boolean, default: false }, // @everyone/@here tek basina yazilsa bile engelle
     punishment: { type: String, enum: ['mute', 'kick', 'ban'], default: 'mute' },
     muteDurationMinutes: { type: Number, default: 10 }
   },
