@@ -136,6 +136,7 @@ router.post('/dashboard/guards', async (req, res) => {
   c.linkFilter.muteDurationMinutes = Number(b.linkFilterMuteMinutes);
 
   c.vanityGuard.enabled = b.vanityGuard_enabled === 'on';
+  c.vanityGuard.savedVanityCode = (b.savedVanityCode || '').trim().toLowerCase() || null;
   c.inviteGuard.enabled = b.inviteGuard_enabled === 'on';
   c.webhookGuard.enabled = b.webhookGuard_enabled === 'on';
   c.webhookGuard.punishment = b.webhookPunishment;

@@ -211,7 +211,8 @@
           <h3>🔗 Vanity URL Guard</h3>
           <div class="desc">Özel davet linkin değiştirilirse otomatik eski haline döner.</div>
           <div class="checkbox-row"><input type="checkbox" name="vanityGuard_enabled" id="vg" <%= config.vanityGuard.enabled ? 'checked' : '' %>><label for="vg" style="margin:0;">Aktif</label></div>
-          <div style="font-size:12px; color:#9aa0ac;">Kayıtlı vanity kod: <b><%= config.vanityGuard.savedVanityCode || 'henüz kaydedilmedi' %></b></div>
+          <label>Korunan vanity kod (discord.gg/ kısmı olmadan)</label>
+          <input type="text" name="savedVanityCode" value="<%= config.vanityGuard.savedVanityCode || '' %>" placeholder="örn: menzil">
         </div>
 
         <div class="card">
